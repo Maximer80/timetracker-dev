@@ -3,6 +3,7 @@ package com.example.timetracker.auth;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "users") // Задаем имя таблицы PostgreSQL
 public class User {
     
     @Id
