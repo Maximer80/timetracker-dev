@@ -2,8 +2,8 @@ package com.example.timetracker.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/auth")
@@ -12,7 +12,7 @@ public class AuthController {
     private final UserService userService;
 
     @Autowired
-    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, UserService userService) {
+    public AuthController(UserService userService) {
         this.userService = userService;
     }
 
@@ -25,8 +25,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody UserLoginRequest loginRequest) {
-        // Здесь должна быть ваша логика для проверки логина
-        return ResponseEntity.ok("Login successful");
+        boolean isAuthenticated = userService.authenticateUser(loginRequest.getUsername(), loginRequest.getPassword());
+        
+        if (isAuthenticated) {
+            return ResponseEntity.ok("Login successful");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Неверные учётные данные пользователя");
+        }
     }
 }
 

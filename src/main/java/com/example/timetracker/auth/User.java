@@ -13,6 +13,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
     
+    @Column(nullable = false)
     private String password;
 
     // Геттеры и сеттеры
