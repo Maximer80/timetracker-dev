@@ -23,7 +23,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/auth/register", "/auth/login").permitAll() // Разрешить публичный доступ к этим маршрутам
                 .anyRequest().authenticated()
             )
             .formLogin(withDefaults()); // Используем метод с настройками по умолчанию
