@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.User;
@@ -26,7 +25,7 @@ public class SecurityConfig {
                 .requestMatchers("/auth/register", "/auth/login").permitAll() // Разрешить публичный доступ к этим маршрутам
                 .anyRequest().authenticated()
             )
-            .formLogin(withDefaults()); // Используем метод с настройками по умолчанию
+            .httpBasic(Customizer.withDefaults()); // Используем новый метод с настройками по умолчанию
 
         return http.build();
     }
@@ -34,10 +33,6 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(); // Используем BCrypt для кодирования паролей
-    }
-
-    private Customizer<FormLoginConfigurer<HttpSecurity>> withDefaults() {
-        return Customizer.withDefaults(); // Возвращаем настройки по умолчанию
     }
 
     @Bean

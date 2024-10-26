@@ -28,6 +28,11 @@ public class UserService {
     	// Кодируем пароль
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         
+        // Устанавливаем роль по умолчанию, если не указана
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+        	user.setRole("user"); // Роль по умолчанию
+        }
+        
         // Сохраняем пользователя в базе данных
         return userRepository.save(user);
     }

@@ -16,9 +16,18 @@ public class User {
     @Column(nullable = false)
     private String password;
     
-    public User(String username, String password) {
+    @Column(nullable = false) // Указываем, что поле не может быть null
+    private String role; // Добавляем поле role
+    
+    // Конструктор без параметров
+    public User() {
+    }
+    
+    // Конструктор с параметрами
+    public User(String username, String password, String role) { // Обновляем конструктор
         this.username = username;
         this.password = password;
+        this.role = role; // Устанавливаем роль
     }
 
     // Геттеры и сеттеры
@@ -44,5 +53,21 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+    
+    public String getRole() { // Геттер для role
+    	return role;
+    }
+    
+    public void setRole(String role) { // Сеттер для role
+    	this.role = role;
+    }
+    
+    @Override
+    public String toString() {
+    	return "User{" +
+    			"id=" + id +
+    			", username='" + username + '\'' +
+    			'}';
     }
 }
