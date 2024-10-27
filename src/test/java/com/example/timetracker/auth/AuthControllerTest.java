@@ -1,4 +1,3 @@
-/*
 package com.example.timetracker.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,15 +7,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.context.annotation.Import;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
-@WebMvcTest(AuthController.class)
+@WebMvcTest(controllers = AuthController.class)
+@Import(SecurityConfig.class)
 @AutoConfigureMockMvc
+@ContextConfiguration(classes = {AuthController.class, SecurityConfig.class})
 public class AuthControllerTest {
 
     @Autowired
@@ -28,13 +32,12 @@ public class AuthControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @WithMockUser(username = "testUser", roles = {"USER"})
     @Test
     public void testRegisterPublicRoute() throws Exception {
-        // Мокируем сохранение нового пользователя
-        User newUser = new User("newUser", "password123");
+        User newUser = new User("testUser", "pass321", "user");
         Mockito.when(userService.registerUser(Mockito.any(User.class))).thenReturn(newUser);
 
-        // Отправляем запрос на регистрацию
         mockMvc.perform(post("/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newUser)))
@@ -43,7 +46,6 @@ public class AuthControllerTest {
 
     @Test
     public void testLoginPublicRouteSuccess() throws Exception {
-        // Мокируем успешную аутентификацию
         Mockito.when(userService.authenticateUser("timetracker_user", "user2024")).thenReturn(true);
 
         UserLoginRequest loginRequest = new UserLoginRequest();
@@ -59,7 +61,6 @@ public class AuthControllerTest {
 
     @Test
     public void testLoginPublicRouteFailure() throws Exception {
-        // Мокируем неудачную аутентификацию
         Mockito.when(userService.authenticateUser("invalidUser", "wrongPassword")).thenReturn(false);
 
         UserLoginRequest loginRequest = new UserLoginRequest();
@@ -73,5 +74,3 @@ public class AuthControllerTest {
                 .andExpect(content().string("Неверные учётные данные пользователя"));
     }
 }
-
-*/
