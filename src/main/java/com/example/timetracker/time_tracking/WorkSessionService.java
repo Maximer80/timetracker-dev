@@ -18,7 +18,8 @@ public class WorkSessionService {
     }
 
     public WorkSession startSession(Long userId) {
-        WorkSession session = new WorkSession(userId, LocalDateTime.now(), "ACTIVE");
+        // Теперь не передаем статус, так как он задается в конструкторе WorkSession
+        WorkSession session = new WorkSession(userId, LocalDateTime.now());
         return workSessionRepository.save(session);
     }
 
@@ -27,7 +28,8 @@ public class WorkSessionService {
         if (optionalSession.isPresent()) {
             WorkSession session = optionalSession.get();
             session.setEndTime(LocalDateTime.now());
-            session.setStatus("COMPLETED");
+            // Устанавливаем статус с использованием enum Status
+            session.setStatus(WorkSession.Status.COMPLETED);
             workSessionRepository.save(session);
         }
         return optionalSession;

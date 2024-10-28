@@ -20,19 +20,33 @@ public class WorkSession {
     @Column(name = "end_time")
     private LocalDateTime endTime;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private Status status;
 
-    // Конструкторы, геттеры и сеттеры
+    // Конструкторы
     public WorkSession() {
     }
 
-    public WorkSession(Long userId, LocalDateTime startTime, String status) {
+    public WorkSession(Long userId, LocalDateTime startTime) {
         this.userId = userId;
         this.startTime = startTime;
-        this.status = status;
+        this.status = Status.IN_PROGRESS; // Устанавливаем начальный статус как "в процессе"
     }
 
+    // Enum для статусов
+    public enum Status {
+        IN_PROGRESS,
+        COMPLETED
+    }
+
+    // Методы для завершения и продолжения сессии
+    public void completeSession() {
+        this.endTime = LocalDateTime.now();
+        this.status = Status.COMPLETED;
+    }
+
+    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }
@@ -65,11 +79,11 @@ public class WorkSession {
         this.endTime = endTime;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 }
