@@ -15,17 +15,29 @@
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
-		<license/>
+    	<license>
+        	<name>The Apache License, Version 2.0</name>
+        	<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+       	    <distribution>repo</distribution>
+    	</license>
 	</licenses>
+
 	<developers>
-		<developer/>
+    	<developer>
+        	<id>Maximer80</id>
+        	<name>Maxim</name>
+        	<email>inffomax@gmail.com</email>
+       		<url>https://github.com/Maximer80</url>
+   		</developer>
 	</developers>
+
 	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
+	    <connection>scm:git:https://github.com/Maximer80/timetracker-dev.git</connection>
+	    <developerConnection>scm:git:git@github.com:Maximer80/timetracker-dev.git</developerConnection>
+	    <url>https://github.com/Maximer80/timetracker-dev</url>
+	    <tag>HEAD</tag>
 	</scm>
+
 	<properties>
 		<java.version>17</java.version>
 	</properties>
