@@ -23,6 +23,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/auth/register", "/auth/login").permitAll() // Разрешить публичный доступ к этим маршрутам
+                .requestMatchers("/api/work-sessions/**").authenticated() // Защитить маршруты для рабочей сессии
                 .anyRequest().authenticated()
             )
             .httpBasic(Customizer.withDefaults()); // Используем новый метод с настройками по умолчанию
