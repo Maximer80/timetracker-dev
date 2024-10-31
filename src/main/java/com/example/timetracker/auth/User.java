@@ -1,33 +1,39 @@
 package com.example.timetracker.auth;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.persistence.*;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
-@Table(name = "users") // Задаем имя таблицы PostgreSQL
-public class User {
-    
+@Table(name = "users")
+public class User implements UserDetails, Serializable {
+
+    private static final long serialVersionUID = 1L; // Добавляем serialVersionUID
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(unique = true, nullable = false)
     private String username;
-    
+
     @Column(nullable = false)
     private String password;
-    
-    @Column(nullable = false) // Указываем, что поле не может быть null
-    private String role; // Добавляем поле role
-    
-    // Конструктор без параметров
+
+    @Column(nullable = false)
+    private String role;
+
     public User() {
     }
-    
-    // Конструктор с параметрами
-    public User(String username, String password, String role) { // Обновляем конструктор
+
+    public User(String username, String password, String role) {
         this.username = username;
         this.password = password;
-        this.role = role; // Устанавливаем роль
+        this.role = role;
     }
 
     // Геттеры и сеттеры
@@ -39,6 +45,7 @@ public class User {
         this.id = id;
     }
 
+    @Override
     public String getUsername() {
         return username;
     }
@@ -47,6 +54,7 @@ public class User {
         this.username = username;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
@@ -54,20 +62,46 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-    
-    public String getRole() { // Геттер для role
-    	return role;
+
+    public String getRole() {
+        return role;
     }
-    
-    public void setRole(String role) { // Сеттер для role
-    	this.role = role;
+
+    public void setRole(String role) {
+        this.role = role;
     }
-    
+
+    // Реализация методов интерфейса UserDetails
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role));
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
     @Override
     public String toString() {
-    	return "User{" +
-    			"id=" + id +
-    			", username='" + username + '\'' +
-    			'}';
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                '}';
     }
 }

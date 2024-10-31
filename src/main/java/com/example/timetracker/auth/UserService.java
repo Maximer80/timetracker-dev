@@ -19,18 +19,23 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User registerUser(User user) {
-        // Проверка, существует ли пользователь
-    	Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
-    	if (existingUser.isPresent()) {
-    		throw new RuntimeException("Пользователь с таким именем уже существует");
-    	}
-    	// Кодируем пароль
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public User registerUser(User user, String currentUserRole) {
+        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
+        if (existingUser.isPresent()) {
+            throw new RuntimeException("Пользователь с таким именем уже существует");
+        }
         
+        // Убедитесь, что только ADMIN может регистрировать новых пользователей
+        if (!"ADMIN".equals(currentUserRole)) {
+            throw new RuntimeException("Недостаточно прав для регистрации пользователя");
+        }
+
+        // Кодируем пароль
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
         // Устанавливаем роль по умолчанию, если не указана
         if (user.getRole() == null || user.getRole().isEmpty()) {
-        	user.setRole("user"); // Роль по умолчанию
+            user.setRole("USER"); // Роль по умолчанию
         }
         
         // Сохраняем пользователя в базе данных

@@ -5,6 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
+import java.util.Base64;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -17,9 +20,24 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        // Проверка существования пользователя
-        User savedUser = userService.registerUser(user);
+    public ResponseEntity<User> register(@RequestBody User user, @RequestHeader("Authorization") String authHeader) {
+        // Извлекаем логин и пароль из заголовка Authorization
+        String[] authParts = new String(Base64.getDecoder().decode(authHeader.substring(6))).split(":");
+        String username = authParts[0];
+        String password = authParts[1];
+
+        // Проверяем аутентификацию текущего пользователя
+        boolean isAuthenticated = userService.authenticateUser(username, password);
+        
+        if (!isAuthenticated) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        // Получаем роль текущего пользователя
+        Optional<User> currentUserOptional = userService.findByUsername(username);
+        String currentUserRole = currentUserOptional.map(User::getRole).orElse("user");
+
+        User savedUser = userService.registerUser(user, currentUserRole);
         return ResponseEntity.ok(savedUser);
     }
 
