@@ -26,9 +26,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/auth/register").hasAuthority("ADMIN") // Только ADMIN может регистрировать
+                .requestMatchers("/auth/register").hasAuthority("admin") // Только admin может регистрировать
                 .requestMatchers("/auth/login").permitAll() // Доступ для всех
-                .requestMatchers("/time_tracking/**").hasAuthority("USER") // Доступ к рабочим сессиям для USER
+                .requestMatchers("/time_tracking/**").hasAuthority("user") // Доступ к рабочим сессиям для user
                 .anyRequest().authenticated()
             )
             .httpBasic(Customizer.withDefaults());
