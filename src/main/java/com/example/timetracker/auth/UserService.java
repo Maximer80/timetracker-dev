@@ -3,13 +3,11 @@ package com.example.timetracker.auth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Optional;
 
-@SuppressWarnings("unused")
 @Service
 public class UserService {
-    
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -50,5 +48,12 @@ public class UserService {
     public boolean authenticateUser(String username, String password) {
         Optional<User> userOptional = findByUsername(username);
         return userOptional.map(user -> passwordEncoder.matches(password, user.getPassword())).orElse(false);
+    }
+
+    // Новый метод для получения userId по имени пользователя
+    public Long getUserIdByUsername(String username) {
+        return findByUsername(username)
+                .map(User::getId)
+                .orElseThrow(() -> new RuntimeException("Пользователь с именем " + username + " не найден"));
     }
 }

@@ -39,6 +39,10 @@ public class WorkSessionService {
         return workSessionRepository.findAll();
     }
 
+    public List<WorkSession> getSessionsByUserId(Long userId) {
+        return workSessionRepository.findByUserId(userId);
+    }
+    
     public Optional<WorkSession> getSessionById(Long sessionId) {
         return workSessionRepository.findById(sessionId);
     }
