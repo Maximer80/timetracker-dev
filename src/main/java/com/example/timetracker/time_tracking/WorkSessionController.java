@@ -15,7 +15,7 @@ import java.util.Optional;
 public class WorkSessionController {
 
     private final WorkSessionService workSessionService;
-    private final UserService userService; // Сервис для работы с пользователями
+    private final UserService userService;
 
     @Autowired
     public WorkSessionController(WorkSessionService workSessionService, UserService userService) {
@@ -25,41 +25,45 @@ public class WorkSessionController {
 
     @PostMapping("/start")
     public ResponseEntity<WorkSession> startSession() {
-        // Получаем текущего пользователя
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
         Long userId = userService.getUserIdByUsername(currentUsername);
 
-        // Запускаем сессию для текущего пользователя
         WorkSession session = workSessionService.startSession(userId);
         return ResponseEntity.ok(session);
     }
 
     @PostMapping("/end/{id}")
     public ResponseEntity<WorkSession> endSession(@PathVariable Long id) {
-        // Получаем текущего пользователя
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
         Long userId = userService.getUserIdByUsername(currentUsername);
 
-        // Проверяем, принадлежит ли сессия текущему пользователю
         Optional<WorkSession> session = workSessionService.getSessionById(id);
-        if (session.isPresent() && session.get().getUserId().equals(userId)) {
+
+        if (session.isPresent() && (session.get().getUserId().equals(userId) || isAdmin(authentication))) {
             WorkSession endedSession = workSessionService.endSession(id).orElseThrow();
             return ResponseEntity.ok(endedSession);
         } else {
-            return ResponseEntity.status(403).build(); // Доступ запрещён
+            return ResponseEntity.status(403).build();
         }
     }
 
     @GetMapping
     public ResponseEntity<List<WorkSession>> getAllSessions() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        Long userId = userService.getUserIdByUsername(currentUsername);
+        List<WorkSession> sessions;
 
-        // Получаем сессии только для текущего пользователя
-        List<WorkSession> sessions = workSessionService.getSessionsByUserId(userId);
+        if (isAdmin(authentication)) {
+            // ADMIN получает все сессии
+            sessions = workSessionService.getAllSessions();
+        } else {
+            // USER получает только свои сессии
+            String currentUsername = authentication.getName();
+            Long userId = userService.getUserIdByUsername(currentUsername);
+            sessions = workSessionService.getSessionsByUserId(userId);
+        }
+
         return ResponseEntity.ok(sessions);
     }
 
@@ -69,18 +73,16 @@ public class WorkSessionController {
         String currentUsername = authentication.getName();
         Long userId = userService.getUserIdByUsername(currentUsername);
 
-        // Проверяем, принадлежит ли сессия текущему пользователю
         Optional<WorkSession> session = workSessionService.getSessionById(id);
-        if (session.isPresent() && session.get().getUserId().equals(userId)) {
+        if (session.isPresent() && (session.get().getUserId().equals(userId) || isAdmin(authentication))) {
             return ResponseEntity.ok(session.get());
         } else {
-            return ResponseEntity.status(403).build(); // Доступ запрещён
+            return ResponseEntity.status(403).build();
         }
     }
-    
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<WorkSession>> getSessionsByUserId(@PathVariable Long userId) {
-        List<WorkSession> sessions = workSessionService.getSessionsByUserId(userId);
-        return ResponseEntity.ok(sessions);
+
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equalsIgnoreCase("ADMIN")); // Проверка в любом регистре
     }
 }
