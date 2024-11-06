@@ -25,7 +25,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(authz -> authz
+            .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/auth/register").hasAuthority("admin") // Только admin может регистрировать
                 .requestMatchers("/auth/login").permitAll() // Доступ для всех
                 .requestMatchers("/time_tracking/**").hasAuthority("user") // Доступ к рабочим сессиям для user
