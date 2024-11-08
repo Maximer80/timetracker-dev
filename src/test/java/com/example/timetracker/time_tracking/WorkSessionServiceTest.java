@@ -127,4 +127,21 @@ class WorkSessionServiceTest {
         assertFalse(result.isPresent());
         verify(workSessionRepository, times(1)).findById(sessionId);
     }
+
+    @Test
+    void startSession_ShouldThrowExceptionIfActiveSessionExists() {
+        Long userId = 1L;
+        WorkSession activeSession = new WorkSession(userId, LocalDateTime.now());
+        activeSession.setStatus(WorkSession.Status.IN_PROGRESS);
+
+        when(workSessionRepository.findByUserIdAndStatus(userId, WorkSession.Status.IN_PROGRESS))
+                .thenReturn(Optional.of(activeSession));
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            workSessionService.startSession(userId);
+        });
+
+        assertEquals("Рабочая сессия уже начата " + activeSession.getStartTime().toString(), exception.getMessage());
+        verify(workSessionRepository, never()).save(any(WorkSession.class));
+    }
 }
