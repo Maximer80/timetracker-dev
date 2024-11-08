@@ -7,6 +7,10 @@ import java.time.LocalDateTime;
 @Table(name = "work_sessions")
 public class WorkSession {
 
+    // Публичный конструктор по умолчанию
+    public WorkSession() {
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,26 +28,30 @@ public class WorkSession {
     @Column(name = "status", nullable = false)
     private Status status;
 
-    // Конструкторы
-    public WorkSession() {
-    }
-
-    public WorkSession(Long userId, LocalDateTime startTime) {
-        this.userId = userId;
-        this.startTime = startTime;
-        this.status = Status.IN_PROGRESS; // Устанавливаем начальный статус как "в процессе"
-    }
-
     // Enum для статусов
     public enum Status {
         IN_PROGRESS,
         COMPLETED
     }
 
-    // Методы для завершения и продолжения сессии
+    // Конструктор для создания новой сессии (всегда IN_PROGRESS)
+    public WorkSession(Long userId, LocalDateTime startTime) {
+        this.userId = userId;
+        this.startTime = startTime;
+        this.status = Status.IN_PROGRESS; // Начальный статус "в процессе"
+    }
+
+    // Метод завершения сессии
     public void completeSession() {
-        this.endTime = LocalDateTime.now();
-        this.status = Status.COMPLETED;
+        if (this.status == Status.IN_PROGRESS) {
+            this.endTime = LocalDateTime.now();
+            this.status = Status.COMPLETED;
+        }
+    }
+
+    // Проверка, является ли сессия активной
+    public boolean isActive() {
+        return this.status == Status.IN_PROGRESS;
     }
 
     // Геттеры и сеттеры

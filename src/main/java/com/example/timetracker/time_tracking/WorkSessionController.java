@@ -24,11 +24,21 @@ public class WorkSessionController {
     }
 
     @PostMapping("/start")
-    public ResponseEntity<WorkSession> startSession() {
+    public ResponseEntity<?> startSession() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
         Long userId = userService.getUserIdByUsername(currentUsername);
 
+        // Проверка на существующую активную сессию
+        Optional<WorkSession> activeSession = workSessionService.getActiveSessionByUserId(userId);
+        if (activeSession.isPresent()) {
+            WorkSession session = activeSession.get();
+            return ResponseEntity.status(409).body(
+                    "Рабочая сессия уже начата в " + session.getStartTime()
+            );
+        }
+
+        // Создание новой рабочей сессии
         WorkSession session = workSessionService.startSession(userId);
         return ResponseEntity.ok(session);
     }
@@ -55,10 +65,8 @@ public class WorkSessionController {
         List<WorkSession> sessions;
 
         if (isAdmin(authentication)) {
-            // ADMIN получает все сессии
             sessions = workSessionService.getAllSessions();
         } else {
-            // USER получает только свои сессии
             String currentUsername = authentication.getName();
             Long userId = userService.getUserIdByUsername(currentUsername);
             sessions = workSessionService.getSessionsByUserId(userId);
@@ -83,6 +91,6 @@ public class WorkSessionController {
 
     private boolean isAdmin(Authentication authentication) {
         return authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equalsIgnoreCase("ADMIN")); // Проверка в любом регистре
+                .anyMatch(a -> a.getAuthority().equalsIgnoreCase("ADMIN"));
     }
 }
