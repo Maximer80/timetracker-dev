@@ -1,60 +1,98 @@
-/*
 package com.example.timetracker.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
-@WebMvcTest(controllers = AuthController.class)
-@AutoConfigureMockMvc
-public class AuthControllerTest {
+import java.util.Optional;
+import java.util.Base64;
 
-    @Autowired
-    private MockMvc mockMvc;
+class AuthControllerTest {
 
-    @MockBean
+    @Mock
     private UserService userService;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    @InjectMocks
+    private AuthController authController;
 
-    @Test
-    public void testLoginPublicRouteSuccess() throws Exception {
-        Mockito.when(userService.authenticateUser("timetracker_user", "user2024")).thenReturn(true);
-
-        UserLoginRequest loginRequest = new UserLoginRequest();
-        loginRequest.setUsername("newuser1");
-        loginRequest.setPassword("pass123");
-
-        mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Login successful"));
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testLoginPublicRouteFailure() throws Exception {
-        Mockito.when(userService.authenticateUser("invalidUser", "wrongPassword")).thenReturn(false);
+    void register_SuccessfulRegistration() {
+        User adminUser = new User();
+        adminUser.setUsername("admin");
+        adminUser.setPassword("adminpassword");
+        adminUser.setRole("admin");
 
+        User newUser = new User();
+        newUser.setUsername("newuser");
+        newUser.setPassword("newpassword");
+
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString("admin:adminpassword".getBytes());
+
+        when(userService.authenticateUser("admin", "adminpassword")).thenReturn(true);
+        when(userService.findByUsername("admin")).thenReturn(Optional.of(adminUser));
+        when(userService.registerUser(newUser, "admin")).thenReturn(newUser);
+
+        ResponseEntity<User> response = authController.register(newUser, authHeader);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(newUser, response.getBody());
+        verify(userService).registerUser(newUser, "admin");
+    }
+
+    @Test
+    void register_Unauthorized() {
+        User newUser = new User();
+        newUser.setUsername("newuser");
+        newUser.setPassword("newpassword");
+
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString("user:wrongpassword".getBytes());
+
+        when(userService.authenticateUser("user", "wrongpassword")).thenReturn(false);
+
+        ResponseEntity<User> response = authController.register(newUser, authHeader);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals(null, response.getBody());
+        verify(userService, never()).registerUser(any(User.class), anyString());
+    }
+
+    @Test
+    void login_SuccessfulLogin() {
         UserLoginRequest loginRequest = new UserLoginRequest();
-        loginRequest.setUsername("invalidUser");
-        loginRequest.setPassword("wrongPassword");
+        loginRequest.setUsername("testuser");
+        loginRequest.setPassword("testpassword");
 
-        mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isUnauthorized())
-                .andExpect(content().string("Неверные учётные данные пользователя"));
+        when(userService.authenticateUser("testuser", "testpassword")).thenReturn(true);
+
+        ResponseEntity<String> response = authController.login(loginRequest);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Login successful", response.getBody());
+    }
+
+    @Test
+    void login_Unauthorized() {
+        UserLoginRequest loginRequest = new UserLoginRequest();
+        loginRequest.setUsername("testuser");
+        loginRequest.setPassword("wrongpassword");
+
+        when(userService.authenticateUser("testuser", "wrongpassword")).thenReturn(false);
+
+        ResponseEntity<String> response = authController.login(loginRequest);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Неверные учётные данные пользователя", response.getBody());
     }
 }
-*/
