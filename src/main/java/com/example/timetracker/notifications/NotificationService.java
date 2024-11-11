@@ -21,7 +21,12 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
-    // Метод для получения уведомлений пользователя
+    // Метод для получения всех уведомлений
+    public List<Notification> getAllNotifications() {
+        return notificationRepository.findAll();
+    }
+
+    // Метод для получения уведомлений конкретного пользователя
     public List<Notification> getNotificationsByUser(Long userId) {
         return notificationRepository.findByUserId(userId);
     }
@@ -32,7 +37,6 @@ public class NotificationService {
                 .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
 
         // Логика отправки уведомления (например, через почту, Telegram и т.д.)
-        // Это место можно дополнительно настроить для интеграции с внешними сервисами.
         sendToTelegram(notification); // Пример функции отправки через Telegram
 
         notification.setSent(true); // Обновляем статус уведомления на "отправлено"
