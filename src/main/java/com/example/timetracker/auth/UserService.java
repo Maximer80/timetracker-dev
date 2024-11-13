@@ -1,5 +1,7 @@
 package com.example.timetracker.auth;
 
+import com.example.timetracker.exception.UserAlreadyExistsException;
+import com.example.timetracker.exception.InsufficientPermissionsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,12 +22,12 @@ public class UserService {
     public User registerUser(User user, String currentUserRole) {
         Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
         if (existingUser.isPresent()) {
-            throw new RuntimeException("Пользователь с таким именем уже существует");
+            throw new UserAlreadyExistsException("Пользователь с таким именем уже существует");
         }
         
         // Убедитесь, что только admin может регистрировать новых пользователей
         if (!"admin".equals(currentUserRole)) {
-            throw new RuntimeException("Недостаточно прав для регистрации пользователя");
+            throw new InsufficientPermissionsException("Недостаточно прав для регистрации пользователя");
         }
 
         // Кодируем пароль
