@@ -1,7 +1,5 @@
 package com.example.timetracker.auth;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,12 +51,4 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Неверные учётные данные пользователя");
         }
     }
-}
-
-// Класс для передачи данных при логине
-@Getter
-@Setter
-class UserLoginRequest {
-    private String username;
-    private String password;
 }
