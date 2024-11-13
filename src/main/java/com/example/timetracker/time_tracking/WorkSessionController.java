@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import java.time.format.DateTimeFormatter;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,9 +34,12 @@ public class WorkSessionController {
         Optional<WorkSession> activeSession = workSessionService.getActiveSessionByUserId(userId);
         if (activeSession.isPresent()) {
             WorkSession session = activeSession.get();
-            return ResponseEntity.status(409).body(
-                    "Рабочая сессия уже начата в " + session.getStartTime()
-            );
+
+            // Форматируем startTime перед отправкой в ответ
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm:ss");
+            String formattedStartTime = session.getStartTime().format(formatter);
+
+            return ResponseEntity.status(409).body("Рабочая сессия уже начата в " + formattedStartTime);
         }
 
         // Создание новой рабочей сессии

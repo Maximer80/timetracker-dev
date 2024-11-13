@@ -1,6 +1,7 @@
 package com.example.timetracker.time_tracking;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,9 +19,11 @@ public class WorkSession {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd | HH:mm:ss")
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd | HH:mm:ss")
     @Column(name = "end_time")
     private LocalDateTime endTime;
 

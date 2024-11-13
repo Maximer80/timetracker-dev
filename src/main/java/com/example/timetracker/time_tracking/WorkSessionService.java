@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +28,14 @@ public class WorkSessionService {
 
         if (activeSession.isPresent()) {
             WorkSession existingSession = activeSession.get();
-            throw new IllegalStateException("Рабочая сессия уже начата " +
-                    existingSession.getStartTime().toString());
+
+            // Создаём форматтер для нужного формата даты и времени
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm:ss");
+
+            // Форматируем дату и вставляем в сообщение
+            String formattedStartTime = existingSession.getStartTime().format(formatter);
+
+            throw new IllegalStateException("Рабочая сессия уже начата " + formattedStartTime);
         }
 
         // Создаём новую сессию, если активной нет
