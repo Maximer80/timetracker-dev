@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import java.time.format.DateTimeFormatter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -127,12 +128,15 @@ class WorkSessionServiceTest {
         assertFalse(result.isPresent());
         verify(workSessionRepository, times(1)).findById(sessionId);
     }
-
     @Test
     void startSession_ShouldThrowExceptionIfActiveSessionExists() {
         Long userId = 1L;
         WorkSession activeSession = new WorkSession(userId, LocalDateTime.now());
         activeSession.setStatus(WorkSession.Status.IN_PROGRESS);
+
+        // Форматируем startTime как в сервисе
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm:ss");
+        String formattedStartTime = activeSession.getStartTime().format(formatter);
 
         when(workSessionRepository.findByUserIdAndStatus(userId, WorkSession.Status.IN_PROGRESS))
                 .thenReturn(Optional.of(activeSession));
@@ -141,7 +145,7 @@ class WorkSessionServiceTest {
             workSessionService.startSession(userId);
         });
 
-        assertEquals("Рабочая сессия уже начата " + activeSession.getStartTime().toString(), exception.getMessage());
+        assertEquals("Рабочая сессия уже начата " + formattedStartTime, exception.getMessage());
         verify(workSessionRepository, never()).save(any(WorkSession.class));
     }
 }
