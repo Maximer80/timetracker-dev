@@ -30,21 +30,14 @@ public class WorkSessionController {
         String currentUsername = authentication.getName();
         Long userId = userService.getUserIdByUsername(currentUsername);
 
-        // Проверка на существующую активную сессию
-        Optional<WorkSession> activeSession = workSessionService.getActiveSessionByUserId(userId);
-        if (activeSession.isPresent()) {
-            WorkSession session = activeSession.get();
-
-            // Форматируем startTime перед отправкой в ответ
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm:ss");
-            String formattedStartTime = session.getStartTime().format(formatter);
-
-            return ResponseEntity.status(409).body("Рабочая сессия уже начата в " + formattedStartTime);
+        try {
+            // Попытка создать рабочую сессию
+            WorkSession session = workSessionService.startSession(userId);
+            return ResponseEntity.ok(session);
+        } catch (IllegalStateException e) {
+            // Если сессия уже активна, отобразим ошибку
+            return ResponseEntity.status(409).body(e.getMessage());
         }
-
-        // Создание новой рабочей сессии
-        WorkSession session = workSessionService.startSession(userId);
-        return ResponseEntity.ok(session);
     }
 
     @PostMapping("/end/{id}")
