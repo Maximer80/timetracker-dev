@@ -2,10 +2,15 @@ package com.example.timetracker.time_tracking;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "work_sessions")
+@Getter
+@Setter
 public class WorkSession {
 
     // Публичный конструктор по умолчанию
@@ -55,46 +60,5 @@ public class WorkSession {
     // Проверка, является ли сессия активной
     public boolean isActive() {
         return this.status == Status.IN_PROGRESS;
-    }
-
-    // Геттеры и сеттеры
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 }
