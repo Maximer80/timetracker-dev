@@ -56,7 +56,7 @@ public class NotificationController {
     @PostMapping("/send/{notificationId}")
     public ResponseEntity<String> sendNotification(@PathVariable Long notificationId) {
         notificationService.sendNotification(notificationId);
-        return ResponseEntity.ok("Notification sent successfully");
+        return ResponseEntity.ok("Уведомление отправлено успешно");
     }
 
     // Метод для проверки, является ли текущий пользователь администратором
