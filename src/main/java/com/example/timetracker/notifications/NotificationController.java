@@ -24,10 +24,12 @@ public class NotificationController {
 
     // Создание нового уведомления
     @PostMapping("/create")
-    public ResponseEntity<Notification> createNotification(@RequestParam Long userId,
-                                                           @RequestParam String message,
-                                                           @RequestParam Notification.NotificationType type) {
-        Notification notification = notificationService.createNotification(userId, message, type);
+    public ResponseEntity<Notification> createNotification(@RequestBody NotificationRequest request) {
+        Notification notification = notificationService.createNotification(
+                request.getUserId(),
+                request.getMessage(),
+                request.getType()
+        );
         return ResponseEntity.ok(notification);
     }
 
