@@ -79,7 +79,7 @@ class AuthControllerTest {
         ResponseEntity<String> response = authController.login(loginRequest);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Login successful", response.getBody());
+        assertEquals("Успешный вход", response.getBody());
     }
 
     @Test

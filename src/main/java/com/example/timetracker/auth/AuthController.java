@@ -46,7 +46,7 @@ public class AuthController {
         boolean isAuthenticated = userService.authenticateUser(loginRequest.getUsername(), loginRequest.getPassword());
         
         if (isAuthenticated) {
-            return ResponseEntity.ok("Login successful");
+            return ResponseEntity.ok("Успешный вход");
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Неверные учётные данные пользователя");
         }
