@@ -45,6 +45,8 @@ public class Notification {
     public enum NotificationType {
         SESSION_START,
         SESSION_END,
-        REMINDER
+        REMINDER,
+        TELEGRAM,
+        EMAIL
     }
 }

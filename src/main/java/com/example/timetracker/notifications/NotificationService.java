@@ -1,6 +1,8 @@
 package com.example.timetracker.notifications;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,10 +11,16 @@ import java.util.List;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final TelegramBot telegramBot; // Telegram бот для отправки сообщений
+    private final JavaMailSender mailSender; // Сервис для отправки e-mail
 
     @Autowired
-    public NotificationService(NotificationRepository notificationRepository) {
+    public NotificationService(NotificationRepository notificationRepository,
+                               TelegramBot telegramBot,
+                               JavaMailSender mailSender) {
         this.notificationRepository = notificationRepository;
+        this.telegramBot = telegramBot;
+        this.mailSender = mailSender;
     }
 
     // Метод для создания уведомления
@@ -31,20 +39,35 @@ public class NotificationService {
         return notificationRepository.findByUserId(userId);
     }
 
-    // Метод для отправки уведомлений (изменение статуса)
+    // Метод для отправки уведомления через указанный канал
     public void sendNotification(Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
 
-        // Логика отправки уведомления (например, через почту, Telegram и т.д.)
-        sendToTelegram(notification); // Пример функции отправки через Telegram
+        if (notification.getType() == Notification.NotificationType.TELEGRAM) {
+            sendToTelegram(notification.getUserId().toString(), notification.getMessage());
+        } else if (notification.getType() == Notification.NotificationType.EMAIL) {
+            sendToEmail(notification.getUserId().toString() + "@example.com",
+                    "Уведомление",
+                    notification.getMessage());
+        }
 
         notification.setSent(true); // Обновляем статус уведомления на "отправлено"
         notificationRepository.save(notification);
     }
 
-    private void sendToTelegram(Notification notification) {
-        // Заглушка для отправки уведомлений в Telegram
-        System.out.println("Отправлено в Telegram: " + notification.getMessage());
+    // Метод для отправки уведомления в Telegram
+    private void sendToTelegram(String chatId, String message) {
+        telegramBot.sendMessage(chatId, message);
+    }
+
+    // Метод для отправки уведомления по e-mail
+    private void sendToEmail(String to, String subject, String message) {
+        SimpleMailMessage email = new SimpleMailMessage();
+        email.setTo(to);
+        email.setSubject(subject);
+        email.setText(message);
+        email.setFrom("your-email@example.com");
+        mailSender.send(email);
     }
 }
