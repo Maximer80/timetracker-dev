@@ -37,8 +37,18 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String chatId = update.getMessage().getChatId().toString();
             String text = update.getMessage().getText();
-            // Обработка полученного сообщения
-            sendMessage(chatId, "Привет! Ваш запрос: " + text);
+
+            // Обработка команды /start
+            if (text.equals("/start")) {
+                sendMessage(chatId, "Привет! Добро пожаловать в TimeTracker.");
+            }
+            // Обработка другой команды или текста
+            else if (text.equals("hello")) {
+                sendMessage(chatId, "Привет! Как я могу помочь?");
+            }
+            else {
+                sendMessage(chatId, "Привет! Ваш запрос: " + text);
+            }
         }
     }
 
