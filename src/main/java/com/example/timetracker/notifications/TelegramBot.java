@@ -36,20 +36,54 @@ public class TelegramBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String chatId = update.getMessage().getChatId().toString();
-            String text = update.getMessage().getText();
+            String text = update.getMessage().getText().trim();
 
-            // Обработка команды /start
-            if (text.equals("/start")) {
-                sendMessage(chatId, "Привет! Добро пожаловать в TimeTracker.");
-            }
-            // Обработка другой команды или текста
-            else if (text.equals("hello")) {
-                sendMessage(chatId, "Привет! Как я могу помочь?");
-            }
-            else {
-                sendMessage(chatId, "Привет! Ваш запрос: " + text);
+            switch (text.toLowerCase()) {
+                case "/start":
+                    sendMessage(chatId, "Привет! Добро пожаловать в timetracker.");
+                    break;
+                case "/start_session":
+                    startWorkSession(chatId);
+                    break;
+                case "/end_session":
+                    endWorkSession(chatId);
+                    break;
+                case "/stats":
+                    showStats(chatId);
+                    break;
+                case "/help":
+                    sendHelp(chatId);
+                    break;
+                default:
+                    sendMessage(chatId, "Привет! Ваш запрос: " + text);
             }
         }
+    }
+
+    private void startWorkSession(String chatId) {
+        // Логика для запуска сессии
+        sendMessage(chatId, "Вы начали рабочую сессию.");
+    }
+
+    private void endWorkSession(String chatId) {
+        // Логика для завершения сессии
+        sendMessage(chatId, "Вы завершили рабочую сессию.");
+    }
+
+    private void showStats(String chatId) {
+        // Логика для отображения статистики
+        sendMessage(chatId, "Ваша статистика за сегодня: 4 часа.");
+    }
+
+    private void sendHelp(String chatId) {
+        String helpText = """
+        /start - Начать работу с ботом.
+        /start_session - Начать рабочую сессию.
+        /end_session - Завершить рабочую сессию.
+        /stats - Показать статистику.
+        /help - Список доступных команд.
+        """;
+        sendMessage(chatId, helpText);
     }
 
     public void sendMessage(String chatId, String text) {
