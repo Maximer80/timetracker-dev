@@ -1,0 +1,34 @@
+package com.example.timetracker.auth;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@RequestBody User user) {
+        // Проверяем, есть ли уже пользователь с таким именем
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            return ResponseEntity.badRequest().body("Username is already taken");
+        }
+
+        // Сохраняем нового пользователя с зашифрованным паролем
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+        return ResponseEntity.ok("User registered successfully");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login() {
+        // Логика входа будет управляться Spring Security
+        return ResponseEntity.ok("Login successful");
+    }
+}

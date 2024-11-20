@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename compilation unit &apos;CoffeMachine.java&apos; to &apos;CoffeeMachine.java&apos;&#x0A;- Original project: &apos;Main&apos;&#x0A;- Original element: &apos;CoffeMachine.java&apos;&#x0A;- Renamed element: &apos;CoffeeMachine.java&apos;" description="Rename compilation unit &apos;CoffeMachine.java&apos;" flags="2" id="org.eclipse.jdt.ui.rename.compilationunit" input="/src&lt;{CoffeMachine.java" name="CoffeeMachine.java" references="false" stamp="1727810697201" version="1.0"/>
+</session>

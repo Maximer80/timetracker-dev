@@ -2,6 +2,8 @@ package com.example.timetracker.notifications;
 
 import com.example.timetracker.telegram_integration.TelegramBot;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,10 +12,16 @@ import java.util.List;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final TelegramBot telegramBot; // Добавляем TelegramBot
+    private final JavaMailSender mailSender; // Добавляем JavaMailSender для e-mail
 
     @Autowired
-    public NotificationService(NotificationRepository notificationRepository) {
+    public NotificationService(NotificationRepository notificationRepository,
+                               TelegramBot telegramBot,
+                               JavaMailSender mailSender) {
         this.notificationRepository = notificationRepository;
+        this.telegramBot = telegramBot;
+        this.mailSender = mailSender;
     }
 
     // Метод для создания уведомления
@@ -37,21 +45,15 @@ public class NotificationService {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
 
-        // Логика отправки уведомления (например, через почту, Telegram и т.д.)
-        sendToTelegram(notification); // Пример функции отправки через Telegram
+        // Логика отправки уведомления (например, через Telegram)
+        sendToTelegram(notification.getUserId().toString(), notification.getMessage());
 
         notification.setSent(true); // Обновляем статус уведомления на "отправлено"
         notificationRepository.save(notification);
     }
 
-<<<<<<< Updated upstream
-    private void sendToTelegram(Notification notification) {
-        // Заглушка для отправки уведомлений в Telegram
-        System.out.println("Отправлено в Telegram: " + notification.getMessage());
-=======
     // Метод для отправки напоминания
     public void sendReminder(Long chatId, String message) {
-        // Логика отправки напоминания, например, через Telegram API
         System.out.println("Напоминание отправлено пользователю с ID: " + chatId);
     }
 
@@ -68,6 +70,5 @@ public class NotificationService {
         email.setText(message);
         email.setFrom("your-email@example.com");
         mailSender.send(email);
->>>>>>> Stashed changes
     }
 }

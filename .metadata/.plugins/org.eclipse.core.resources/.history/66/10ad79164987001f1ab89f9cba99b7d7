@@ -1,0 +1,6 @@
+@SpringBootTest
+public class TimetrackerApplicationTests {
+    @Test
+    void contextLoads() {
+    }
+}
