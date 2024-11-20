@@ -3,6 +3,7 @@ package com.example.timetracker.time_tracking;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -64,5 +65,20 @@ public class WorkSessionService {
 
     public Optional<WorkSession> getSessionById(Long sessionId) {
         return workSessionRepository.findById(sessionId);
+    }
+
+    public String getBasicStats(Long userId) {
+        List<WorkSession> sessions = workSessionRepository.findByUserId(userId);
+        if (sessions.isEmpty()) {
+            return "У вас пока нет завершенных рабочих сессий.";
+        }
+
+        int totalSessions = sessions.size();
+        long totalDuration = sessions.stream()
+                .filter(session -> session.getEndTime() != null)
+                .mapToLong(session -> Duration.between(session.getStartTime(), session.getEndTime()).toMinutes())
+                .sum();
+
+        return String.format("Всего завершенных сессий: %d\nОбщее время работы: %d минут", totalSessions, totalDuration);
     }
 }

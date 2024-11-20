@@ -1,5 +1,6 @@
 package com.example.timetracker.notifications;
 
+import com.example.timetracker.telegram_integration.TelegramBot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +44,30 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
+<<<<<<< Updated upstream
     private void sendToTelegram(Notification notification) {
         // Заглушка для отправки уведомлений в Telegram
         System.out.println("Отправлено в Telegram: " + notification.getMessage());
+=======
+    // Метод для отправки напоминания
+    public void sendReminder(Long chatId, String message) {
+        // Логика отправки напоминания, например, через Telegram API
+        System.out.println("Напоминание отправлено пользователю с ID: " + chatId);
+    }
+
+    // Метод для отправки уведомления в Telegram
+    private void sendToTelegram(String chatId, String message) {
+        telegramBot.sendMessage(chatId, message);
+    }
+
+    // Метод для отправки уведомления по e-mail
+    private void sendToEmail(String to, String subject, String message) {
+        SimpleMailMessage email = new SimpleMailMessage();
+        email.setTo(to);
+        email.setSubject(subject);
+        email.setText(message);
+        email.setFrom("your-email@example.com");
+        mailSender.send(email);
+>>>>>>> Stashed changes
     }
 }
